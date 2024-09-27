@@ -1,10 +1,10 @@
 import React from 'react';
-import ScannerComponent from './scannerComponent';
+import ScanComponent from './ScanComponent';
 
 function App() {
   return (
     <div className="App">
-      <ScannerComponent />
+      <ScanComponent />
     </div>
   );
 }
