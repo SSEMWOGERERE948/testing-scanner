@@ -99,63 +99,44 @@
 
 // export default ScanComponent;
 
-// src/ScanComponent.js
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
 
-const ScanComponent = () => {
-    const [scanStatus, setScanStatus] = useState('');
-    const [loading, setLoading] = useState(false);
+function ScanDocument() {
+  const [scanStatus, setScanStatus] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState(null);
 
-    const startScan = async () => {
-        setLoading(true);
-        setScanStatus(''); // Reset status
+  const startScan = async () => {
+    setScanStatus("Scanning...");
 
-        try {
-            const response = await axios.post('http://localhost:8080/documents/start');
-            setScanStatus(response.data); // Set the response message
-        } catch (error) {
-            setScanStatus(`Error: ${error.response ? error.response.data : error.message}`);
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+      const response = await fetch("http://localhost:8080/documents/start", {
+        method: "POST",
+      });
 
-    return (
-        <div style={styles.container}>
-            <h1>Document Scanner</h1>
-            <button onClick={startScan} disabled={loading} style={styles.button}>
-                {loading ? 'Scanning...' : 'Start Scan'}
-            </button>
-            {scanStatus && <p style={styles.status}>{scanStatus}</p>}
-        </div>
-    );
-};
+      const result = await response.text();
+      setScanStatus(result);
 
-const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f4f4f4',
-    },
-    button: {
-        padding: '10px 20px',
-        fontSize: '16px',
-        cursor: 'pointer',
-        marginTop: '20px',
-        borderRadius: '5px',
-        border: 'none',
-        backgroundColor: '#007BFF',
-        color: 'white',
-    },
-    status: {
-        marginTop: '20px',
-        fontSize: '18px',
-        color: 'green',
-    },
-};
+      if (response.ok) {
+        setDownloadUrl("http://localhost:8080/documents/document");
+      }
+    } catch (error) {
+      setScanStatus("Error during scanning: " + error.message);
+    }
+  };
 
-export default ScanComponent;
+  return (
+    <div>
+      <h1>Document Scanner</h1>
+      <button onClick={startScan}>Start Scan</button>
+      <p>{scanStatus}</p>
+
+      {downloadUrl && (
+        <a href={downloadUrl} download="ScannedDocument.pdf">
+          Download Scanned Document
+        </a>
+      )}
+    </div>
+  );
+}
+
+export default ScanDocument;
